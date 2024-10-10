@@ -1,8 +1,8 @@
-resource "aws_elastic_beanstalk_environment" "banking-beanstalk-env" {
-  name                = "bank-beanstalk-env"
-  application         = aws_elastic_beanstalk_application.banking-beanstalk-app.name
-  solution_stack_name = "64bit Amazon Linux 2 v3.5.1 running Corretto 17"
-  cname_prefix        = "java-banking-demo-app"
+resource "aws_elastic_beanstalk_environment" "teachua-beanstalk-env" {
+  name                = "teachua-env"
+  application         = aws_elastic_beanstalk_application.teachua-app.name
+  solution_stack_name = "64bit Amazon Linux 2023 v5.3.2 running Tomcat 9 Corretto 17"
+  cname_prefix        = "teachua-app"
 
   setting {
     namespace = "aws:ec2:vpc"
@@ -13,7 +13,7 @@ resource "aws_elastic_beanstalk_environment" "banking-beanstalk-env" {
   setting {
     namespace = "aws:ec2:vpc"
     name      = "AssociatePublicIpAddress"
-    value     = true
+    value     = "true"
   }
 
   setting {
@@ -31,13 +31,13 @@ resource "aws_elastic_beanstalk_environment" "banking-beanstalk-env" {
   setting {
     namespace = "aws:autoscaling:launchconfiguration"
     name      = "IamInstanceProfile"
-    value     = "Ansible_admin"
+    value     = var.iam_instance_profile
   }
 
   setting {
     namespace = "aws:autoscaling:launchconfiguration"
     name      = "InstanceType"
-    value     = "t2.micro"
+    value     = "t2.medium"
   }
 
   setting {
@@ -55,19 +55,21 @@ resource "aws_elastic_beanstalk_environment" "banking-beanstalk-env" {
   setting {
     namespace = "aws:autoscaling:launchconfiguration"
     name      = "EC2KeyName"
-    value     = aws_key_pair.bank_app_key.key_name
+    value     = aws_key_pair.teachua_app_key.key_name
   }
+
+  # value     = aws_key_pair.teachua_app_key.key_name
 
   setting {
     namespace = "aws:autoscaling:launchconfiguration"
     name      = "SecurityGroups"
-    value     = aws_security_group.banking-beanstalk-Instance.id
+    value     = aws_security_group.teachua-beanstalk-Instance.id
   }
 
   setting {
     namespace = "aws:elbv2:loadbalancer"
     name      = "SecurityGroups"
-    value     = aws_security_group.bank-beanstalk-app-elb-sg.id
+    value     = aws_security_group.teachua-beanstalk-app-elb-sg.id
   }
 
   setting {
@@ -91,7 +93,7 @@ resource "aws_elastic_beanstalk_environment" "banking-beanstalk-env" {
   setting {
     namespace = "aws:elasticbeanstalk:application:environment"
     name      = "SERVER_PORT"
-    value     = "5000"
+    value     = "8080"
   }
 
   setting {
@@ -113,6 +115,12 @@ resource "aws_elastic_beanstalk_environment" "banking-beanstalk-env" {
   }
 
   setting {
+    namespace = "aws:elasticbeanstalk:environment"
+    name      = "LoadBalancerType"
+    value     = "application"
+  }
+
+  setting {
     namespace = "aws:elasticbeanstalk:healthreporting:system"
     name      = "SystemType"
     value     = "enhanced"
@@ -130,6 +138,39 @@ resource "aws_elastic_beanstalk_environment" "banking-beanstalk-env" {
     value     = "200"
   }
 
-  depends_on = [aws_security_group.bank-beanstalk-app-elb-sg, aws_security_group.banking-beanstalk-Instance, aws_security_group.bank_app_rds_sg]
+  setting {
+    namespace = "aws:elasticbeanstalk:application:environment"
+    name      = "DATASOURCE_URL"
+    value     = "jdbc:mariadb://${aws_db_instance.teachua_rds.endpoint}/teachua"
+   }
 
+  setting {
+    namespace = "aws:elasticbeanstalk:application:environment"
+    name      = "DATASOURCE_USER"
+    value     = "user"
+  }
+
+  setting {
+    namespace = "aws:elasticbeanstalk:application:environment"
+    name      = "DATASOURCE_PASSWORD"
+    value     = "password"
+  }
+
+  setting {
+    namespace = "aws:elasticbeanstalk:application:environment"
+    name      = "JDBC_CONNECTION_STRING"
+    value     = "org.mariadb.jdbc.Driver"
+  }
+
+  setting {
+    namespace = "aws:elasticbeanstalk:application:environment"
+    name      = "JDBC_DRIVER"
+    value     = "org.mariadb.jdbc.Driver"
+  }
+
+  depends_on = [
+    aws_security_group.teachua-beanstalk-app-elb-sg, 
+    aws_security_group.teachua-beanstalk-Instance, 
+    aws_security_group.teachua_app_rds_sg
+  ]
 }

@@ -16,15 +16,15 @@ variable "ZONE3" {
 }
 
 variable "PUB_KEY" {
-  default = "web02_key.pub"
+  default = "/home/codespace/.ssh/web02_key.pub"
 }
 
 variable "PRIV_KEY" {
-  default = "web02_key"
+  default = "/home/codespace/.ssh/web02_key"
 }
 
 variable "VPC_NAME" {
-  default = "banking-vpc"
+  default = "teachua-vpc"
 }
 
 variable "VPC_CIDR" {
@@ -43,3 +43,7 @@ variable "PUB_SUB3_CIDR" {
   default = "10.0.3.0/24"
 }
 
+variable "iam_instance_profile" {
+  description = "IAM Instance Profile name"
+  default     = "teachua-instance-profile"
+}
