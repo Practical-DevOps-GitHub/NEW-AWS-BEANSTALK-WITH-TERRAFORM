@@ -55,3 +55,4 @@ aws elasticbeanstalk create-application-version \
   sudo service docker start
   docker run -it --rm mysql:8.0 mysql -h teachua-db.ctegro5wnfvo.us-east-1.rds.amazonaws.com -u user -p
 
+ps aux | grep tomcat

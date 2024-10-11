@@ -91,12 +91,6 @@ resource "aws_elastic_beanstalk_environment" "teachua-beanstalk-env" {
   }
 
   setting {
-    namespace = "aws:elasticbeanstalk:application:environment"
-    name      = "SERVER_PORT"
-    value     = "8080"
-  }
-
-  setting {
     namespace = "aws:elasticbeanstalk:environment"
     name      = "EnvironmentType"
     value     = "LoadBalanced"
@@ -138,6 +132,12 @@ resource "aws_elastic_beanstalk_environment" "teachua-beanstalk-env" {
     value     = "200"
   }
 
+    setting {
+    namespace = "aws:elasticbeanstalk:application:environment"
+    name      = "SERVER_PORT"
+    value     = "8080"
+  }
+
   setting {
     namespace = "aws:elasticbeanstalk:application:environment"
     name      = "DATASOURCE_URL"
@@ -156,16 +156,46 @@ resource "aws_elastic_beanstalk_environment" "teachua-beanstalk-env" {
     value     = "password"
   }
 
-  setting {
-    namespace = "aws:elasticbeanstalk:application:environment"
-    name      = "JDBC_CONNECTION_STRING"
-    value     = "org.mariadb.jdbc.Driver"
-  }
+  # setting {
+  #  namespace = "aws:elasticbeanstalk:application:environment"
+  #  name      = "JDBC_CONNECTION_STRING"
+  #  value     = "org.mariadb.jdbc.Driver"
+  #}
 
   setting {
     namespace = "aws:elasticbeanstalk:application:environment"
     name      = "JDBC_DRIVER"
     value     = "org.mariadb.jdbc.Driver"
+  }
+
+  setting {
+    namespace = "aws:elasticbeanstalk:application:environment"
+    name      = "DB_HOST"
+    value     = "teachua-db.ctegro5wnfvo.us-east-1.rds.amazonaws.com"
+  }
+
+  setting {
+    namespace = "aws:elasticbeanstalk:application:environment"
+    name      = "DB_PORT"
+    value     = "3306"
+  }
+
+  setting {
+    namespace = "aws:elasticbeanstalk:application:environment"
+    name      = "DB_NAME"
+    value     = "teachua"
+  }
+
+  setting {
+    namespace = "aws:elasticbeanstalk:application:environment"
+    name      = "DB_USER"
+    value     = "user"
+  }
+
+  setting {
+    namespace = "aws:elasticbeanstalk:application:environment"
+    name      = "DB_PASSWORD"
+    value     = "password"
   }
 
   depends_on = [
