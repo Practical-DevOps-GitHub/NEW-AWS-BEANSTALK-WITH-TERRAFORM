@@ -1,14 +1,26 @@
 digraph G {
   rankdir = "RL";
   node [shape = rect, fontname = "sans-serif"];
-  "aws_db_instance.demobank_rds" [label="aws_db_instance.demobank_rds"];
-  "aws_db_subnet_group.demoapp_db_subnet_group" [label="aws_db_subnet_group.demoapp_db_subnet_group"];
-  "aws_elastic_beanstalk_application.banking-beanstalk-app" [label="aws_elastic_beanstalk_application.banking-beanstalk-app"];
-  "aws_elastic_beanstalk_environment.banking-beanstalk-env" [label="aws_elastic_beanstalk_environment.banking-beanstalk-env"];
-  "aws_key_pair.bank_app_key" [label="aws_key_pair.bank_app_key"];
-  "aws_security_group.bank-beanstalk-app-elb-sg" [label="aws_security_group.bank-beanstalk-app-elb-sg"];
-  "aws_security_group.bank_app_rds_sg" [label="aws_security_group.bank_app_rds_sg"];
-  "aws_security_group.banking-beanstalk-Instance" [label="aws_security_group.banking-beanstalk-Instance"];
+  "aws_db_instance.teachua_rds" [label="aws_db_instance.teachua_rds"];
+  "aws_db_parameter_group.teachua_param_group" [label="aws_db_parameter_group.teachua_param_group"];
+  "aws_db_subnet_group.teachua_app_db_subnet_group" [label="aws_db_subnet_group.teachua_app_db_subnet_group"];
+  "aws_elastic_beanstalk_application.teachua-app" [label="aws_elastic_beanstalk_application.teachua-app"];
+  "aws_elastic_beanstalk_environment.teachua-beanstalk-env" [label="aws_elastic_beanstalk_environment.teachua-beanstalk-env"];
+  "aws_iam_instance_profile.beanstalk_instance_profile" [label="aws_iam_instance_profile.beanstalk_instance_profile"];
+  "aws_iam_instance_profile.ec2_instance_profile" [label="aws_iam_instance_profile.ec2_instance_profile"];
+  "aws_iam_policy.ec2_policy" [label="aws_iam_policy.ec2_policy"];
+  "aws_iam_role.beanstalk_role" [label="aws_iam_role.beanstalk_role"];
+  "aws_iam_role.ec2_role" [label="aws_iam_role.ec2_role"];
+  "aws_iam_role.rds_custom_role" [label="aws_iam_role.rds_custom_role"];
+  "aws_iam_role_policy_attachment.admin_access" [label="aws_iam_role_policy_attachment.admin_access"];
+  "aws_iam_role_policy_attachment.beanstalk_admin_access" [label="aws_iam_role_policy_attachment.beanstalk_admin_access"];
+  "aws_iam_role_policy_attachment.ec2_policy_attachment" [label="aws_iam_role_policy_attachment.ec2_policy_attachment"];
+  "aws_iam_role_policy_attachment.rds_access" [label="aws_iam_role_policy_attachment.rds_access"];
+  "aws_key_pair.teachua_app_key" [label="aws_key_pair.teachua_app_key"];
+  "aws_security_group.teachua-beanstalk-Instance" [label="aws_security_group.teachua-beanstalk-Instance"];
+  "aws_security_group.teachua-beanstalk-app-elb-sg" [label="aws_security_group.teachua-beanstalk-app-elb-sg"];
+  "aws_security_group.teachua_app_rds_sg" [label="aws_security_group.teachua_app_rds_sg"];
+  "null_resource.grant_privileges" [label="null_resource.grant_privileges"];
   subgraph "cluster_module.vpc" {
     label = "module.vpc"
     fontname = "sans-serif"
@@ -95,17 +107,27 @@ digraph G {
     "module.vpc.aws_vpn_gateway_route_propagation.private" [label="aws_vpn_gateway_route_propagation.private"];
     "module.vpc.aws_vpn_gateway_route_propagation.public" [label="aws_vpn_gateway_route_propagation.public"];
   }
-  "aws_db_instance.demobank_rds" -> "aws_db_subnet_group.demoapp_db_subnet_group";
-  "aws_db_instance.demobank_rds" -> "aws_security_group.bank_app_rds_sg";
-  "aws_db_subnet_group.demoapp_db_subnet_group" -> "module.vpc.aws_subnet.public";
-  "aws_elastic_beanstalk_environment.banking-beanstalk-env" -> "aws_elastic_beanstalk_application.banking-beanstalk-app";
-  "aws_elastic_beanstalk_environment.banking-beanstalk-env" -> "aws_key_pair.bank_app_key";
-  "aws_elastic_beanstalk_environment.banking-beanstalk-env" -> "aws_security_group.bank-beanstalk-app-elb-sg";
-  "aws_elastic_beanstalk_environment.banking-beanstalk-env" -> "aws_security_group.bank_app_rds_sg";
-  "aws_elastic_beanstalk_environment.banking-beanstalk-env" -> "module.vpc.aws_subnet.public";
-  "aws_security_group.bank-beanstalk-app-elb-sg" -> "module.vpc.aws_vpc.this";
-  "aws_security_group.bank_app_rds_sg" -> "aws_security_group.banking-beanstalk-Instance";
-  "aws_security_group.banking-beanstalk-Instance" -> "module.vpc.aws_vpc.this";
+  "aws_db_instance.teachua_rds" -> "aws_db_parameter_group.teachua_param_group";
+  "aws_db_instance.teachua_rds" -> "aws_db_subnet_group.teachua_app_db_subnet_group";
+  "aws_db_instance.teachua_rds" -> "aws_security_group.teachua_app_rds_sg";
+  "aws_db_subnet_group.teachua_app_db_subnet_group" -> "module.vpc.aws_subnet.public";
+  "aws_elastic_beanstalk_environment.teachua-beanstalk-env" -> "aws_db_instance.teachua_rds";
+  "aws_elastic_beanstalk_environment.teachua-beanstalk-env" -> "aws_elastic_beanstalk_application.teachua-app";
+  "aws_elastic_beanstalk_environment.teachua-beanstalk-env" -> "aws_iam_instance_profile.ec2_instance_profile";
+  "aws_elastic_beanstalk_environment.teachua-beanstalk-env" -> "aws_key_pair.teachua_app_key";
+  "aws_elastic_beanstalk_environment.teachua-beanstalk-env" -> "aws_security_group.teachua-beanstalk-Instance";
+  "aws_elastic_beanstalk_environment.teachua-beanstalk-env" -> "aws_security_group.teachua-beanstalk-app-elb-sg";
+  "aws_iam_instance_profile.beanstalk_instance_profile" -> "aws_iam_role.beanstalk_role";
+  "aws_iam_instance_profile.ec2_instance_profile" -> "aws_iam_role.ec2_role";
+  "aws_iam_role_policy_attachment.admin_access" -> "aws_iam_role.ec2_role";
+  "aws_iam_role_policy_attachment.beanstalk_admin_access" -> "aws_iam_role.beanstalk_role";
+  "aws_iam_role_policy_attachment.ec2_policy_attachment" -> "aws_iam_policy.ec2_policy";
+  "aws_iam_role_policy_attachment.ec2_policy_attachment" -> "aws_iam_role.ec2_role";
+  "aws_iam_role_policy_attachment.rds_access" -> "aws_iam_role.ec2_role";
+  "aws_security_group.teachua-beanstalk-Instance" -> "module.vpc.aws_vpc.this";
+  "aws_security_group.teachua-beanstalk-app-elb-sg" -> "module.vpc.aws_vpc.this";
+  "aws_security_group.teachua_app_rds_sg" -> "module.vpc.aws_vpc.this";
+  "null_resource.grant_privileges" -> "aws_db_instance.teachua_rds";
   "module.vpc.data.aws_iam_policy_document.vpc_flow_log_cloudwatch" -> "module.vpc.data.aws_caller_identity.current";
   "module.vpc.data.aws_iam_policy_document.vpc_flow_log_cloudwatch" -> "module.vpc.data.aws_partition.current";
   "module.vpc.data.aws_iam_policy_document.vpc_flow_log_cloudwatch" -> "module.vpc.data.aws_region.current";

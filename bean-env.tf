@@ -1,7 +1,9 @@
 resource "aws_elastic_beanstalk_environment" "teachua-beanstalk-env" {
   name                = "teachua-env"
   application         = aws_elastic_beanstalk_application.teachua-app.name
-  solution_stack_name = "64bit Amazon Linux 2023 v5.3.2 running Tomcat 9 Corretto 17"
+  solution_stack_name = "64bit Amazon Linux 2023 v4.3.2 running Corretto 17"
+  tier                = "WebServer"
+  # version_label       = aws_elastic_beanstalk_application_version.tf-eb-app-version.id
   cname_prefix        = "teachua-app"
 
   setting {
@@ -31,7 +33,7 @@ resource "aws_elastic_beanstalk_environment" "teachua-beanstalk-env" {
   setting {
     namespace = "aws:autoscaling:launchconfiguration"
     name      = "IamInstanceProfile"
-    value     = var.iam_instance_profile
+    value     = aws_iam_instance_profile.ec2_instance_profile.name
   }
 
   setting {
@@ -109,12 +111,6 @@ resource "aws_elastic_beanstalk_environment" "teachua-beanstalk-env" {
   }
 
   setting {
-    namespace = "aws:elasticbeanstalk:environment"
-    name      = "LoadBalancerType"
-    value     = "application"
-  }
-
-  setting {
     namespace = "aws:elasticbeanstalk:healthreporting:system"
     name      = "SystemType"
     value     = "enhanced"
@@ -156,12 +152,6 @@ resource "aws_elastic_beanstalk_environment" "teachua-beanstalk-env" {
     value     = "password"
   }
 
-  # setting {
-  #  namespace = "aws:elasticbeanstalk:application:environment"
-  #  name      = "JDBC_CONNECTION_STRING"
-  #  value     = "org.mariadb.jdbc.Driver"
-  #}
-
   setting {
     namespace = "aws:elasticbeanstalk:application:environment"
     name      = "JDBC_DRIVER"
@@ -170,32 +160,38 @@ resource "aws_elastic_beanstalk_environment" "teachua-beanstalk-env" {
 
   setting {
     namespace = "aws:elasticbeanstalk:application:environment"
-    name      = "DB_HOST"
-    value     = "teachua-db.ctegro5wnfvo.us-east-1.rds.amazonaws.com"
-  }
-
-  setting {
-    namespace = "aws:elasticbeanstalk:application:environment"
-    name      = "DB_PORT"
-    value     = "3306"
-  }
-
-  setting {
-    namespace = "aws:elasticbeanstalk:application:environment"
-    name      = "DB_NAME"
+    name      = "RDS_DB_NAME"
     value     = "teachua"
   }
 
   setting {
     namespace = "aws:elasticbeanstalk:application:environment"
-    name      = "DB_USER"
+    name      = "RDS_HOSTNAME"
+    value     = "teachua-db.ctegro5wnfvo.us-east-1.rds.amazonaws.com"
+  }
+
+  setting {
+    namespace = "aws:elasticbeanstalk:application:environment"
+    name      = "RDS_PASSWORD"
+    value     = "password"
+  }
+
+  setting {
+    namespace = "aws:elasticbeanstalk:application:environment"
+    name      = "RDS_PORT"
+    value     = "3306"
+  }
+
+  setting {
+    namespace = "aws:elasticbeanstalk:application:environment"
+    name      = "RDS_USERNAME"
     value     = "user"
   }
 
   setting {
     namespace = "aws:elasticbeanstalk:application:environment"
-    name      = "DB_PASSWORD"
-    value     = "password"
+    name      = "JDBC_CONNECTION_STRING"
+    value     = "jdbc:mariadb://teachua-db.ctegro5wnfvo.us-east-1.rds.amazonaws.com:3306/teachua?user=username&password=password"
   }
 
   depends_on = [
@@ -204,3 +200,6 @@ resource "aws_elastic_beanstalk_environment" "teachua-beanstalk-env" {
     aws_security_group.teachua_app_rds_sg
   ]
 }
+
+
+

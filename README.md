@@ -33,7 +33,7 @@ aws elasticbeanstalk update-environment --environment-name teachua-env --version
 aws elasticbeanstalk create-application-version \
   --application-name teachua-app \
   --version-label v2.1 \
-  --source-bundle S3Bucket="teachua-bucket-new",S3Key="dev2.war"
+  --source-bundle S3Bucket="teachua-bucket-new",S3Key="dev3.war"
 
   eb-backend-bucket
 
@@ -43,16 +43,38 @@ aws elasticbeanstalk create-application-version \
 
   mysql -h teachua-db.ctegro5wnfvo.us-east-1.rds.amazonaws.com -u user -p
 
-  sudo yum update -y
-  sudo yum install mysql-community-client -y
-
-
-  sudo rpm -Uvh https://repo.mysql.com/mysql80-community-release-el7.rpm
-  sudo yum update -y
-  sudo yum install mysql-community-client -y
-
-  sudo yum install docker -y
-  sudo service docker start
-  docker run -it --rm mysql:8.0 mysql -h teachua-db.ctegro5wnfvo.us-east-1.rds.amazonaws.com -u user -p
-
 ps aux | grep tomcat
+
+sudo apt update
+sudo apt install python3-pip
+pip3 install awsebcli --upgrade --user
+pip3 --version
+eb --version
+
+
+aws elasticbeanstalk update-environment \
+  --environment-name teachua-env \
+  --version-label v2.1
+
+sudo yum update -y
+sudo yum install https://dev.mysql.com/get/mysql57-community-release-el7-11.noarch.rpm
+sudo yum install mysql-community-client --nogpgcheck -y
+
+
+ sudo find / -name "catalina.*"
+/etc/tomcat9/catalina.policy
+/etc/tomcat9/catalina.properties
+/var/log/tomcat9/catalina.2024-10-15.log
+/usr/share/java/tomcat9/catalina.jar
+/usr/share/java/tomcat/catalina.jar
+/usr/share/maven-poms/tomcat/catalina.pom
+
+cd /var/app/current
+
+/usr/share/tomcat9/webapps/ROOT
+
+cd /var/log/nginx/ - logs
+
+cat /etc/nginx/nginx.conf - config-file
+
+mysql -u user -p -h teachua-db.ctegro5wnfvo.us-east-1.rds.amazonaws.com teachua < import.sql
