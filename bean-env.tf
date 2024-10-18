@@ -1,10 +1,9 @@
-resource "aws_elastic_beanstalk_environment" "teachua-beanstalk-env" {
-  name                = "teachua-env"
-  application         = aws_elastic_beanstalk_application.teachua-app.name
+resource "aws_elastic_beanstalk_environment" "new_teachua_beanstalk_env" {
+  name                = "new-teachua-env"
+  application         = aws_elastic_beanstalk_application.new_teachua_app.name
   solution_stack_name = "64bit Amazon Linux 2023 v4.3.2 running Corretto 17"
   tier                = "WebServer"
-  # version_label       = aws_elastic_beanstalk_application_version.tf-eb-app-version.id
-  cname_prefix        = "teachua-app"
+  cname_prefix        = "new-teachua-app"
 
   setting {
     namespace = "aws:ec2:vpc"
@@ -21,19 +20,19 @@ resource "aws_elastic_beanstalk_environment" "teachua-beanstalk-env" {
   setting {
     namespace = "aws:ec2:vpc"
     name      = "Subnets"
-    value     = join(",", [module.vpc.public_subnets[0], module.vpc.public_subnets[1], module.vpc.public_subnets[2]])
+   value     = join(",", [module.vpc.public_subnets[0], module.vpc.public_subnets[1]])
   }
 
   setting {
     namespace = "aws:ec2:vpc"
     name      = "ELBSubnets"
-    value     = join(",", [module.vpc.public_subnets[0], module.vpc.public_subnets[1], module.vpc.public_subnets[2]])
+    value     = join(",", [module.vpc.public_subnets[0], module.vpc.public_subnets[1]])
   }
 
   setting {
     namespace = "aws:autoscaling:launchconfiguration"
     name      = "IamInstanceProfile"
-    value     = aws_iam_instance_profile.ec2_instance_profile.name
+    value     = aws_iam_instance_profile.ec2_instance_profile_2.name
   }
 
   setting {
@@ -57,21 +56,19 @@ resource "aws_elastic_beanstalk_environment" "teachua-beanstalk-env" {
   setting {
     namespace = "aws:autoscaling:launchconfiguration"
     name      = "EC2KeyName"
-    value     = aws_key_pair.teachua_app_key.key_name
+    value     = aws_key_pair.teachua_app_key_2.key_name
   }
-
-  # value     = aws_key_pair.teachua_app_key.key_name
 
   setting {
     namespace = "aws:autoscaling:launchconfiguration"
     name      = "SecurityGroups"
-    value     = aws_security_group.teachua-beanstalk-Instance.id
+    value     = aws_security_group.new_teachua_beanstalk_instance.id
   }
 
   setting {
     namespace = "aws:elbv2:loadbalancer"
     name      = "SecurityGroups"
-    value     = aws_security_group.teachua-beanstalk-app-elb-sg.id
+    value     = aws_security_group.new_teachua_beanstalk_app_elb_sg.id
   }
 
   setting {
@@ -128,17 +125,35 @@ resource "aws_elastic_beanstalk_environment" "teachua-beanstalk-env" {
     value     = "200"
   }
 
-    setting {
+  setting {
+    namespace = "aws:autoscaling:launchconfiguration"
+    name      = "IamInstanceProfile"
+    value     = aws_iam_instance_profile.beanstalk_ec2_instance_profile_2.name
+  }
+
+  #setting {
+  #  namespace = "aws:elasticbeanstalk:cloudwatch:logs"
+  #  option_name = "StreamLogs"
+   # value = "true"
+  #}
+
+  setting {
     namespace = "aws:elasticbeanstalk:application:environment"
-    name      = "SERVER_PORT"
-    value     = "8080"
+    name      = "AWS_REGION"
+    value     = var.REGION
+  }
+
+  setting {
+    namespace = "aws:elasticbeanstalk:application:environment"
+    name      = "LOG_LEVEL"
+    value     = "info" 
   }
 
   setting {
     namespace = "aws:elasticbeanstalk:application:environment"
     name      = "DATASOURCE_URL"
-    value     = "jdbc:mariadb://${aws_db_instance.teachua_rds.endpoint}/teachua"
-   }
+    value     = "jdbc:mariadb://${aws_db_instance.new_teachua_rds.endpoint}/new-teachua"
+  }
 
   setting {
     namespace = "aws:elasticbeanstalk:application:environment"
@@ -156,50 +171,11 @@ resource "aws_elastic_beanstalk_environment" "teachua-beanstalk-env" {
     namespace = "aws:elasticbeanstalk:application:environment"
     name      = "JDBC_DRIVER"
     value     = "org.mariadb.jdbc.Driver"
-  }
-
-  setting {
-    namespace = "aws:elasticbeanstalk:application:environment"
-    name      = "RDS_DB_NAME"
-    value     = "teachua"
-  }
-
-  setting {
-    namespace = "aws:elasticbeanstalk:application:environment"
-    name      = "RDS_HOSTNAME"
-    value     = "teachua-db.ctegro5wnfvo.us-east-1.rds.amazonaws.com"
-  }
-
-  setting {
-    namespace = "aws:elasticbeanstalk:application:environment"
-    name      = "RDS_PASSWORD"
-    value     = "password"
-  }
-
-  setting {
-    namespace = "aws:elasticbeanstalk:application:environment"
-    name      = "RDS_PORT"
-    value     = "3306"
-  }
-
-  setting {
-    namespace = "aws:elasticbeanstalk:application:environment"
-    name      = "RDS_USERNAME"
-    value     = "user"
-  }
-
-  setting {
-    namespace = "aws:elasticbeanstalk:application:environment"
-    name      = "JDBC_CONNECTION_STRING"
-    value     = "jdbc:mariadb://teachua-db.ctegro5wnfvo.us-east-1.rds.amazonaws.com:3306/teachua?user=username&password=password"
-  }
+  }       
 
   depends_on = [
-    aws_security_group.teachua-beanstalk-app-elb-sg, 
-    aws_security_group.teachua-beanstalk-Instance, 
-    aws_security_group.teachua_app_rds_sg
+    aws_security_group.new_teachua_beanstalk_app_elb_sg, 
+    aws_security_group.new_teachua_beanstalk_instance, 
+    aws_security_group.new_teachua_app_rds_sg
   ]
 }
-
-
-

@@ -1,6 +1,6 @@
-# Роль для EC2
-resource "aws_iam_role" "ec2_role" {
-  name = "ec2-role"
+# Role for EC2
+resource "aws_iam_role" "ec2_role_2" {
+  name = "ec2-role-2"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -17,9 +17,9 @@ resource "aws_iam_role" "ec2_role" {
   })
 }
 
-# Політика для EC2
-resource "aws_iam_policy" "ec2_policy" {
-  name        = "ec2-deployment-policy"
+# Policy for EC2
+resource "aws_iam_policy" "ec2_policy_2" {
+  name        = "ec2-deployment-policy-2"
   description = "Policy for EC2 instance to deploy applications"
 
   policy = jsonencode({
@@ -48,81 +48,43 @@ resource "aws_iam_policy" "ec2_policy" {
         Resource = "*"
       },
       {
-        Action = "elasticbeanstalk:*"
-        Effect = "Allow"
-        Resource = "*"
-      },
-      {
         Action = "logs:*"
         Effect = "Allow"
-        Resource = "*"
-      },
-      {
-        Action = [
-          "logs:DescribeLogGroups",
-          "logs:DescribeLogStreams",
-          "logs:GetLogEvents",
-          "logs:CreateLogGroup",
-          "logs:CreateLogStream",
-          "logs:PutLogEvents"
-        ]
-        Effect   = "Allow"
         Resource = "*"
       },
       {
         Action = "rds-db:connect",
         Effect = "Allow",
         Resource = "arn:aws:rds-db:*:*:dbuser/*/*"
-      }
-    ]
-  })
-}
-
-# Приєднання політики до ролі EC2
-resource "aws_iam_role_policy_attachment" "ec2_policy_attachment" {
-  role       = aws_iam_role.ec2_role.name
-  policy_arn = aws_iam_policy.ec2_policy.arn
-}
-
-# Профіль інстансу для EC2
-resource "aws_iam_instance_profile" "ec2_instance_profile" {
-  name = "teachua-instance-profile"
-  role = aws_iam_role.ec2_role.name
-}
-
-# Роль для RDS
-resource "aws_iam_role" "rds_custom_role" {
-  name = "CustomRDSRole"
-  assume_role_policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
+      },
       {
-        Action = "sts:AssumeRole"
-        Principal = {
-          Service = "rds.amazonaws.com"
-        }
+        Action = [
+          "rds:DescribeDBInstances",
+          "rds:DescribeDBClusters",
+          "rds:Connect"
+        ]
         Effect = "Allow"
-        Sid    = ""
+        Resource = "*"
       }
     ]
   })
 }
 
-# Політики для доступу до RDS
-resource "aws_iam_role_policy_attachment" "rds_access" {
-  role       = aws_iam_role.ec2_role.name
-  policy_arn = "arn:aws:iam::aws:policy/AmazonRDSFullAccess"
+# Attach policy to EC2 role
+resource "aws_iam_role_policy_attachment" "new_ec2_policy_attachment" {
+  role       = aws_iam_role.ec2_role_2.name
+  policy_arn = aws_iam_policy.ec2_policy_2.arn
 }
 
-# Приєднання політики адміністратора до ролі EC2
-resource "aws_iam_role_policy_attachment" "admin_access" {
-  role       = aws_iam_role.ec2_role.name
-  policy_arn = "arn:aws:iam::aws:policy/AdministratorAccess"
+# Instance profile for EC2
+resource "aws_iam_instance_profile" "ec2_instance_profile_2" {
+  name = "teachua-instance-profile-2"
+  role = aws_iam_role.ec2_role_2.name
 }
 
-# Роль для Beanstalk
-resource "aws_iam_role" "beanstalk_role" {
-  name = "beanstalk-role"
+# Role for Beanstalk
+resource "aws_iam_role" "beanstalk_role_2" {
+  name = "beanstalk-role-2"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -139,14 +101,70 @@ resource "aws_iam_role" "beanstalk_role" {
   })
 }
 
-# Приєднання політики адміністратора до ролі Beanstalk
-resource "aws_iam_role_policy_attachment" "beanstalk_admin_access" {
-  role       = aws_iam_role.beanstalk_role.name
-  policy_arn = "arn:aws:iam::aws:policy/AdministratorAccess"
+# Policy for Beanstalk
+resource "aws_iam_policy" "beanstalk_policy_2" {
+  name        = "beanstalk-policy-2"
+  description = "Policy for Beanstalk"
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = [
+          "elasticbeanstalk:*",
+          "logs:*",
+          "s3:*"
+        ]
+        Effect   = "Allow"
+        Resource = "*"
+      }
+    ]
+  })
 }
 
-# Профіль для Beanstalk
-resource "aws_iam_instance_profile" "beanstalk_instance_profile" {
-  name = "beanstalk-instance-profile"
-  role = aws_iam_role.beanstalk_role.name
+# Attach policy to Beanstalk role
+resource "aws_iam_role_policy_attachment" "new_beanstalk_policy_attachment" {
+  role       = aws_iam_role.beanstalk_role_2.name
+  policy_arn = aws_iam_policy.beanstalk_policy_2.arn
 }
+
+resource "aws_iam_instance_profile" "beanstalk_ec2_instance_profile_2" {
+  name = "beanstalk-ec2-instance-profile-2"
+  role = aws_iam_role.beanstalk_ec2_role_2.name
+}
+
+# Role for Beanstalk EC2
+resource "aws_iam_role" "beanstalk_ec2_role_2" {
+  name = "beanstalk-ec2-role-2"
+
+  assume_role_policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Principal": {
+        "Service": "ec2.amazonaws.com"
+      },
+      "Action": "sts:AssumeRole"
+    }
+  ]
+}
+EOF
+}
+
+# Policy attachment for Beanstalk EC2 logging
+#resource "aws_iam_policy_attachment" "beanstalk_ec2_logging_2" {
+#  name       = "beanstalk-ec2-logging-2"
+#  roles      = [aws_iam_role.beanstalk_ec2_role_2.name]
+#  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSElasticBeanstalkWebTier"
+#}
+
+# Policy attachment for CloudWatch logs
+resource "aws_iam_role_policy_attachment" "cloudwatch_logs" {
+  policy_arn = "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
+  role       = aws_iam_role.beanstalk_ec2_role_2.name
+}
+
+
+
